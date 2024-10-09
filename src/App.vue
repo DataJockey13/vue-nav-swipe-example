@@ -1,23 +1,66 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import {RouterLink, RouterView, useRoute, useRouter} from 'vue-router'
+import {menuRoutes} from "@/router/routes";
+
+const router = useRouter();
+const route = useRoute();
+
+function routerLeft()
+{
+  const routeNames = menuRoutes.map((r) => r.name).filter(Boolean) as string[];
+  const currentIndex = routeNames.indexOf(route.name as string);
+  if (currentIndex > 0)
+  {
+    const targetRouteName = routeNames[currentIndex - 1];
+    router.push({
+      name: targetRouteName
+    })
+  }
+}
+
+function routerRight()
+{
+  const routeNames = menuRoutes.map((r) => r.name).filter(Boolean) as string[];
+  const currentIndex = routeNames.indexOf(route.name as string);
+  if (currentIndex < routeNames.length - 1)
+  {
+    const targetRouteName = routeNames[currentIndex + 1];
+    router.push({
+      name: targetRouteName
+    })
+  }
+}
+
+const onSwipeLeft = () => {
+
+  console.log("on swipe left");
+  routerRight();
+}
+
+function onSwipeRight(): void
+{
+  console.log("on swipe right");
+  routerLeft();
+}
+
 </script>
 
 <template>
   <header>
     <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
     <div class="wrapper">
       <HelloWorld msg="You did it!" />
 
       <nav>
         <RouterLink to="/">Home</RouterLink>
+        <RouterLink to="/second">Second</RouterLink>
+        <RouterLink to="/third">Third</RouterLink>
         <RouterLink to="/about">About</RouterLink>
       </nav>
     </div>
   </header>
 
-  <RouterView />
+  <RouterView v-touch:swipe.left="onSwipeLeft" v-touch:swipe.right="onSwipeRight" />
 </template>
 
 <style scoped>

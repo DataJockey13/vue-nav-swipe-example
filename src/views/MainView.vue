@@ -8,12 +8,10 @@
 </template>
 
 <style scoped>
-@media (min-width: 1024px) {
-  .main {
-    background-color: #0000ff;
-    min-height: 70vh;
-    display: flex;
-    align-items: center;
-  }
+.main {
+  background-color: #884FF4;
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
 }
 </style>

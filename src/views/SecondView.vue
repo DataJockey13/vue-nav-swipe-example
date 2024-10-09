@@ -1,12 +1,12 @@
 <template>
-  <div class="about">
-    <h1>This is an about page</h1>
+  <div class="second">
+    <h1>This is the second page</h1>
   </div>
 </template>
 
 <style>
-.about {
-  background-color: #ffFF0F;
+.second {
+  background-color: #8FFfFF;
   min-height: 70vh;
   display: flex;
   align-items: center;
