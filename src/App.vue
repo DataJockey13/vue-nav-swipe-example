@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import {RouterLink, RouterView, useRoute, useRouter} from 'vue-router'
 import {menuRoutes} from "@/router/routes";
+import {onBeforeUnmount, ref} from "vue";
 
 const router = useRouter();
 const route = useRoute();
+
+const isDragging = ref(false);
+const eventFired = ref(false);
+const offset = ref(0);
+const start = ref(0);
 
 function routerLeft()
 {
@@ -31,8 +37,8 @@ function routerRight()
   }
 }
 
-const onSwipeLeft = () => {
-
+function onSwipeLeft(): void
+{
   console.log("on swipe left");
   routerRight();
 }
@@ -43,27 +49,84 @@ function onSwipeRight(): void
   routerLeft();
 }
 
+function onMouseDown(e: MouseEvent): void
+{
+  isDragging.value = true;
+  eventFired.value = false;
+  start.value = e.clientX;
+  offset.value = 0;
+
+  window.addEventListener('mousemove', onMouseMove);
+  window.addEventListener('mouseup', onMouseUp);
+}
+function onMouseMove(e: MouseEvent): void
+{
+  if (isDragging.value)
+  {
+    offset.value = e.clientX - start.value;
+  }
+}
+function onMouseUp(): void
+{
+  let distance = Math.abs(offset.value);
+  if (distance > 400)
+  {
+    let isSwipedLeft = offset.value < 0;
+
+    if (isSwipedLeft)
+    {
+      onSwipeLeft();
+    }
+    else
+    {
+      onSwipeRight();
+    }
+
+    eventFired.value = true;
+  }
+
+  isDragging.value = false;
+  offset.value = 0;
+
+  removeEventListeners();
+}
+
+function removeEventListeners()
+{
+  window.removeEventListener('mousemove', onMouseMove);
+  window.removeEventListener('mouseup', onMouseUp);
+}
+
+onBeforeUnmount(removeEventListeners);
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+  <div class="scrollBox">
+    <header>
+      <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+      <div class="wrapper">
+        <label>isDragging:{{ isDragging }} | eventFired:{{ eventFired }} | offset:{{ offset }}</label>
 
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/second">Second</RouterLink>
-        <RouterLink to="/third">Third</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
-
-  <RouterView v-touch:swipe.left="onSwipeLeft" v-touch:swipe.right="onSwipeRight" />
+        <nav>
+          <RouterLink to="/">Home</RouterLink>
+          <RouterLink to="/second">Second</RouterLink>
+          <RouterLink to="/third">Third</RouterLink>
+          <RouterLink to="/about">About</RouterLink>
+        </nav>
+      </div>
+    </header>
+    <RouterView
+        :style="{ transform: 'translateX(' + offset + 'px)' }"
+        @mousedown="onMouseDown"/>
+  </div>
 </template>
 
 <style scoped>
+.scrollBox {
+  overflow: hidden;
+  background-color: darkgray;
+}
+
 header {
   line-height: 1.5;
   max-height: 100vh;
